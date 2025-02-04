@@ -17,10 +17,7 @@ phases:
   install:
     runtime-versions:
       java: corretto11
-    commands:
-      # Install Git (if not already available)
-      - yum install -y git
-      
+    commands:     
       # Install Sonar Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       - unzip sonar-scanner-cli-4.7.0.2747-linux.zip
