@@ -18,7 +18,11 @@ phases:
   install:
     runtime-versions:
       java: corretto11
-    commands:     
+    commands:
+      # Set AWS account ID and region
+      - export AWS_DEFAULT_REGION=us-east-1
+      - export AWS_ACCOUNT_ID=522814713874
+      - export ECR_REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       # Install Sonar Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       - unzip sonar-scanner-cli-4.7.0.2747-linux.zip
