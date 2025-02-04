@@ -6,6 +6,7 @@ env:
     SONAR_ORGANIZATION: "saikumarbalabadra"
     SONAR_HOST_URL: "https://sonarcloud.io"
     ECR_REPOSITORY_NAME: "sai-kumar/my-images"
+    AWS_ACCOUNT_ID: "522814713874" 
     AWS_REGION: "us-east-1"
     DOCKER_IMAGE_TAG: "latest"
     # Git repository variables
