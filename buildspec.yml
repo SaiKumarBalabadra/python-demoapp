@@ -23,6 +23,16 @@ phases:
       - export AWS_DEFAULT_REGION=us-east-1
       - export AWS_ACCOUNT_ID=522814713874
       - export ECR_REPO_URI=522814713874.dkr.ecr.us-east-1.amazonaws.com/sai-kumar/my-images
+      - export SONAR_PROJECT_KEY=python-demoapp
+      - export SONAR_ORGANIZATION=saikumarbalabadra
+      - export SONAR_HOST_URL=https://sonarcloud.io
+      - export ECR_REPOSITORY_NAME=sai-kumar/my-images
+      - export AWS_REGION=us-east-1
+      - export DOCKER_IMAGE_TAG=latest
+    # Git repository variables
+    GIT_REPOSITORY_URL: "https://github.com/SaiKumarBalabadra/python-demoapp.git"
+    GIT_BRANCH: "main"
+    SONAR_TOKEN: "/CodeBuild/SONAR_TOKEN"
       # Install Sonar Scanner
       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       - unzip sonar-scanner-cli-4.7.0.2747-linux.zip
