@@ -29,7 +29,6 @@ phases:
       # Clone the source code
       - git clone $GIT_REPOSITORY_URL source
       - cd source
-      - git checkout $GIT_BRANCH
       
       # Login to AWS ECR
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
