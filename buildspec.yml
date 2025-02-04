@@ -1,0 +1,73 @@
+version: 0.2
+
+env:
+  variables:
+    SONAR_PROJECT_KEY: "python-demoapp"
+    SONAR_ORGANIZATION: "saikumarbalabadra"
+    SONAR_HOST_URL: "https://sonarcloud.io"
+    ECR_REPOSITORY_NAME: "sai-kumar/my-images"
+    AWS_REGION: "us-east-1"
+    DOCKER_IMAGE_TAG: "latest"
+    # Git repository variables
+    GIT_REPOSITORY_URL: "https://github.com/SaiKumarBalabadra/python-demoapp.git"
+    GIT_BRANCH: "main"
+    SONAR_TOKEN: "/CodeBuild/SONAR_TOKEN"
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+    commands:
+      # Install Git (if not already available)
+      - yum install -y git
+      
+      # Install Sonar Scanner
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+      - unzip sonar-scanner-cli-4.7.0.2747-linux.zip
+      - mv sonar-scanner-4.7.0.2747-linux /opt/sonar-scanner
+      - export PATH=$PATH:/opt/sonar-scanner/bin
+
+  pre_build:
+    commands:
+      # Clone the source code
+      - git clone $GIT_REPOSITORY_URL source
+      - cd source
+      - git checkout $GIT_BRANCH
+      
+      # Login to AWS ECR
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      
+      # Run Sonar Analysis
+      - sonar-scanner \
+          -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+          -Dsonar.organization=$SONAR_ORGANIZATION \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=$SONAR_HOST_URL \
+          -Dsonar.token=$SONAR_TOKEN \
+          -Dsonar.java.binaries=target/classes \
+          -Dsonar.reportPath=sonar-report.json
+
+  build:
+    commands:
+      # Build Docker image
+      - docker build -t $ECR_REPOSITORY_NAME:$DOCKER_IMAGE_TAG .
+      - docker tag $ECR_REPOSITORY_NAME:$DOCKER_IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:$DOCKER_IMAGE_TAG
+
+  post_build:
+    commands:
+      # Push Docker image to ECR
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:$DOCKER_IMAGE_TAG
+      
+      # Save build information
+      - echo Build completed on `date`
+      - echo "Image pushed to $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY_NAME:$DOCKER_IMAGE_TAG"
+
+artifacts:
+  files:
+    - sonar-report.json
+    - imagedefinitions.json
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
