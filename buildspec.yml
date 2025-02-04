@@ -2,9 +2,6 @@ version: 0.2
 
 env:
   variables:
-    SONAR_PROJECT_KEY: "python-demoapp"
-    SONAR_ORGANIZATION: "saikumarbalabadra"
-    SONAR_HOST_URL: "https://sonarcloud.io"
     ECR_REPOSITORY_NAME: "sai-kumar/my-images"
     AWS_ACCOUNT_ID: "522814713874" 
     AWS_REGION: "us-east-1"
@@ -12,7 +9,6 @@ env:
     # Git repository variables
     GIT_REPOSITORY_URL: "https://github.com/SaiKumarBalabadra/python-demoapp.git"
     GIT_BRANCH: "main"
-    SONAR_TOKEN: "/CodeBuild/SONAR_TOKEN"
 
 phases:
   install:
@@ -23,17 +19,9 @@ phases:
       - export AWS_DEFAULT_REGION=us-east-1
       - export AWS_ACCOUNT_ID=522814713874
       - export ECR_REPO_URI=522814713874.dkr.ecr.us-east-1.amazonaws.com/sai-kumar/my-images
-      - export SONAR_PROJECT_KEY=python-demoapp
-      - export SONAR_ORGANIZATION=saikumarbalabadra
-      - export SONAR_HOST_URL=https://sonarcloud.io
       - export ECR_REPOSITORY_NAME=sai-kumar/my-images
       - export AWS_REGION=us-east-1
       - export DOCKER_IMAGE_TAG=latest
-      # Install Sonar Scanner
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-      - unzip sonar-scanner-cli-4.7.0.2747-linux.zip
-      - mv sonar-scanner-4.7.0.2747-linux /opt/sonar-scanner
-      - export PATH=$PATH:/opt/sonar-scanner/bin
 
   pre_build:
     commands:
@@ -43,16 +31,6 @@ phases:
       
       # Login to AWS ECR
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 522814713874.dkr.ecr.us-east-1.amazonaws.com
-      
-      # Run Sonar Analysis
-
-      - sonar-scanner \
-          -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.token=$SONAR_TOKEN \
-          -Dsonar.java.binaries=target/classes \
-          -Dsonar.reportPath=sonar-report.json
 
   build:
     commands:
@@ -71,7 +49,6 @@ phases:
 
 artifacts:
   files:
-    - sonar-report.json
     - imagedefinitions.json
   discard-paths: yes
 
